@@ -194,11 +194,9 @@ require("lazy").setup({
 	},
 	{
 		"lervag/vimtex",
-		lazy = false, -- don’t lazy load VimTeX
+		lazy = false,
 		init = function()
-			-- Set local leader
 			vim.g.maplocalleader = ","
-			-- Viewer (e.g., Zathura)
 			vim.g.vimtex_view_method = "zathura"
 		end,
 	},
