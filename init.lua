@@ -1,7 +1,6 @@
 vim.g.mapleader = ","
 vim.g.maplocalleader = ","
 vim.g.have_nerd_font = true
-
 vim.cmd([[filetype plugin indent on]])
 vim.cmd([[syntax enable]])
 -- See `:help vim.o`
@@ -62,7 +61,6 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.cmd("syntax off")
 	end,
 })
-
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -549,7 +547,7 @@ require("lazy").setup({
 				-- <c-k>: Toggle signature help
 				--
 				-- See :h blink-cmp-config-keymap for defining your own keymap
-				preset = "cmdline",
+				preset = "super-tab",
 
 				-- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
 				--    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -678,10 +676,8 @@ require("lazy").setup({
 				--  If you are experiencing weird indenting issues, add the language to
 				--  the list of additional_vim_regex_highlighting and disabled languages for indent.
 				additional_vim_regex_highlighting = { "ruby" },
-				-- Disable default syntax for LaTeX files to use Tree-sitter instead
 				disable = function(lang, buf)
 					if lang == "latex" then
-						-- Check if this is a LaTeX file and VimTeX is loaded
 						return vim.b[buf].vimtex_main ~= nil and vim.g.vimtex_syntax_enabled == 1
 					end
 					return false
@@ -697,9 +693,30 @@ require("lazy").setup({
 		-- Download gameplay video after install/update,
 	},
 	{ "nvim-tree/nvim-web-devicons", opts = {} },
-	{'akinsho/bufferline.nvim', version = "*", dependencies = 'nvim-tree/nvim-web-devicons'},
-
-
+	{
+		"akinsho/bufferline.nvim",
+		version = "*",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		config = function()
+			require("bufferline").setup({
+				options = {
+					mode = "buffers", -- or "tabs"
+					diagnostics = "nvim_lsp",
+					separator_style = "slant", -- or "thick" | "thin" | { 'left', 'right' }
+					show_close_icon = false,
+					show_buffer_close_icons = false,
+					offsets = {
+						{
+							filetype = "neo-tree",
+							text = "File Explorer",
+							text_align = "center",
+							separator = true,
+						},
+					},
+				},
+			})
+		end,
+	},
 	require("kickstart.plugins.debug"),
 	require("kickstart.plugins.indent_line"),
 	require("kickstart.plugins.lint"),
