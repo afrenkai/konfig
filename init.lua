@@ -1,6 +1,6 @@
 vim.g.mapleader = ","
 vim.g.maplocalleader = ","
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 vim.cmd([[filetype plugin indent on]])
 vim.cmd([[syntax enable]])
@@ -696,6 +696,9 @@ require("lazy").setup({
 		config = true,
 		-- Download gameplay video after install/update,
 	},
+	{ "nvim-tree/nvim-web-devicons", opts = {} },
+	{'akinsho/bufferline.nvim', version = "*", dependencies = 'nvim-tree/nvim-web-devicons'},
+
 
 	require("kickstart.plugins.debug"),
 	require("kickstart.plugins.indent_line"),
