@@ -669,14 +669,13 @@ require("lazy").setup({
 					},
 				},
 				list = {
-					selection = "auto_insert", -- or "preselect" or "manual"
+					selection = { preselect = true, auto_insert = true },
 				},
 			},
 
 			sources = {
 				-- Add buffer completion for words from open buffers
 				default = { "lsp", "path", "snippets", "buffer", "lazydev" },
-				cmdline = {}, -- Disable sources for command-line mode
 				providers = {
 					lazydev = {
 						module = "lazydev.integrations.blink",
@@ -722,6 +721,10 @@ require("lazy").setup({
 						},
 					},
 				},
+			},
+
+			cmdline = {
+				sources = {}, -- Disable sources for command-line mode
 			},
 
 			snippets = {
