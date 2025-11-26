@@ -94,7 +94,6 @@ vim.api.nvim_create_autocmd("BufNewFile", {
 
 		vim.api.nvim_buf_set_lines(0, 0, -1, false, template)
 
-	
 		vim.api.nvim_win_set_cursor(0, { 21, 0 })
 
 		vim.bo.modified = false
@@ -556,6 +555,7 @@ require("lazy").setup({
 				lua = { "stylua" },
 				-- Conform can also run multiple formatters sequentially
 				python = { "isort", "black" },
+				latex = { "latexindent", "tex-fmt" },
 				--
 				-- You can use 'stop_after_first' to run the first available formatter from the list
 				-- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -582,14 +582,13 @@ require("lazy").setup({
 					-- `friendly-snippets` contains a variety of premade snippets.
 					--    See the README about individual language/framework/plugin snippets:
 					--    https://github.com/rafamadriz/friendly-snippets
-					-- {
-					--   'rafamadriz/friendly-snippets',
-					--   config = function()
-					--     require('luasnip.loaders.from_vscode').lazy_load()
-					--   end,
-					-- },
+					{
+						"rafamadriz/friendly-snippets",
+						config = function()
+							require("luasnip.loaders.from_vscode").lazy_load()
+						end,
+					},
 				},
-				opts = {},
 			},
 			"folke/lazydev.nvim",
 		},
@@ -624,23 +623,135 @@ require("lazy").setup({
 			},
 
 			appearance = {
+				-- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+				-- Adjusts spacing and ensures icons render correctly
 				nerd_font_variant = "mono",
-			},
-
-			completion = {
-				documentation = { auto_show = true, auto_show_delay_ms = 500 },
-			},
-
-			sources = {
-				default = { "lsp", "path", "snippets", "lazydev" },
-				providers = {
-					lazydev = { module = "lazydev.integrations.blink", score_offset = 100 },
+				use_nvim_cmp_as_default = true,
+				kind_icons = {
+					Text = "󰉿",
+					Method = "󰊕",
+					Function = "󰊕",
+					Constructor = "󰒓",
+					Field = "󰜢",
+					Variable = "󰆦",
+					Class = "󰠱",
+					Interface = "󰜰",
+					Module = "󰆧",
+					Property = "󰖷",
+					Unit = "󰪚",
+					Value = "󰦨",
+					Enum = "󰦨",
+					Keyword = "󰻾",
+					Snippet = "󰩫",
+					Color = "󰏘",
+					File = "󰈔",
+					Reference = "󰬲",
+					Folder = "󰉋",
+					EnumMember = "󰦨",
+					Constant = "󰏿",
+					Struct = "󰆼",
+					Event = "󱐋",
+					Operator = "󰪚",
+					TypeParameter = "󰬛",
 				},
 			},
 
-			snippets = { preset = "luasnip" },
-			fuzzy = { implementation = "lua" },
-			signature = { enabled = true },
+			completion = {
+				documentation = {
+					auto_show = true,
+					auto_show_delay_ms = 200, -- Faster documentation popup
+					window = { border = "rounded" },
+				},
+				menu = {
+					border = "rounded",
+					draw = {
+						columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "kind" } },
+					},
+				},
+				list = {
+					selection = "auto_insert", -- or "preselect" or "manual"
+				},
+			},
+
+			sources = {
+				-- Add buffer completion for words from open buffers
+				default = { "lsp", "path", "snippets", "buffer", "lazydev" },
+				cmdline = {}, -- Disable sources for command-line mode
+				providers = {
+					lazydev = {
+						module = "lazydev.integrations.blink",
+						name = "LazyDev",
+						score_offset = 100, -- Prioritize lazydev completions
+					},
+					lsp = {
+						name = "LSP",
+						module = "blink.cmp.sources.lsp",
+						score_offset = 90, -- High priority for LSP
+					},
+					snippets = {
+						name = "Snippets",
+						module = "blink.cmp.sources.snippets",
+						score_offset = 85, -- High priority for snippets
+						opts = {
+							friendly_snippets = true,
+							search_paths = { vim.fn.stdpath("config") .. "/snippets" },
+							extended_filetypes = {},
+						},
+					},
+					path = {
+						name = "Path",
+						module = "blink.cmp.sources.path",
+						score_offset = 80,
+						opts = {
+							trailing_slash = true,
+							label_trailing_slash = true,
+							get_cwd = function(context)
+								return vim.fn.expand(("#%d:p:h"):format(context.bufnr))
+							end,
+						},
+					},
+					buffer = {
+						name = "Buffer",
+						module = "blink.cmp.sources.buffer",
+						score_offset = 50, -- Lower priority for buffer words
+						opts = {
+							get_bufnrs = function()
+								-- Show completions from all loaded buffers
+								return vim.api.nvim_list_bufs()
+							end,
+						},
+					},
+				},
+			},
+
+			snippets = {
+				preset = "luasnip",
+				expand = function(snippet)
+					require("luasnip").lsp_expand(snippet)
+				end,
+				active = function(filter)
+					if filter and filter.direction then
+						return require("luasnip").jumpable(filter.direction)
+					end
+					return require("luasnip").in_snippet()
+				end,
+				jump = function(direction)
+					require("luasnip").jump(direction)
+				end,
+			},
+
+			fuzzy = {
+				-- Better fuzzy matching with more comprehensive scoring
+				prebuilt_binaries = {
+					download = true,
+					force_version = nil,
+				},
+			},
+
+			signature = {
+				enabled = true,
+				window = { border = "rounded" },
+			},
 		},
 	},
 
