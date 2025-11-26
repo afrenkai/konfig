@@ -28,9 +28,8 @@ vim.o.inccommand = "split"
 vim.o.cursorline = true
 vim.o.scrolloff = 10
 vim.o.confirm = true
+vim.opt.path:append("**")
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
-
--- Diagnostic keymaps
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
@@ -61,6 +60,77 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.cmd("syntax off")
 	end,
 })
+
+vim.api.nvim_create_autocmd("BufNewFile", {
+	desc = "Insert LaTeX template for new .tex files",
+	pattern = "*.tex",
+	group = vim.api.nvim_create_augroup("latex-template", { clear = true }),
+	callback = function()
+		local template = {
+			"\\documentclass{article}",
+			"",
+			"% Packages",
+			"\\usepackage[utf8]{inputenc}",
+			"\\usepackage[T1]{fontenc}",
+			"\\usepackage{amsmath, amssymb, amsthm}",
+			"\\usepackage{graphicx}",
+			"\\usepackage{hyperref}",
+			"",
+			"% Title information",
+			"\\title{Document Title}",
+			"\\author{Your Name}",
+			"\\date{\\today}",
+			"",
+			"\\begin{document}",
+			"",
+			"\\maketitle",
+			"",
+			"\\section{Introduction}",
+			"",
+			"Start writing here.",
+			"",
+			"\\end{document}",
+		}
+
+		vim.api.nvim_buf_set_lines(0, 0, -1, false, template)
+
+	
+		vim.api.nvim_win_set_cursor(0, { 21, 0 })
+
+		vim.bo.modified = false
+	end,
+})
+
+local function find_root()
+	local patterns = { ".git", "package.json", "Cargo.toml", "pyproject.toml", "setup.py", "Makefile" }
+	local current_file = vim.fn.expand("%:p:h")
+	if current_file == "" then
+		return
+	end
+	for file, pattern in ipairs(patterns) do
+		local root = vim.fn.finddir(pattern, current_file .. ";")
+		if root ~= "" then
+			vim.cmd("cd " .. vim.fn.fnamemodify(root, ":h"))
+			return
+		end
+		root = vim.fn.findfile(pattern, current_file .. ";")
+		if root ~= "" then
+			vim.cmd("cd " .. vim.fn.fnamemodify(root, ":h"))
+			return
+		end
+	end
+end
+
+vim.api.nvim_create_autocmd("BufEnter", {
+	desc = "Auto-detect project root directory",
+	group = vim.api.nvim_create_augroup("auto-root", { clear = true }),
+	callback = function()
+		if vim.bo.buftype == "" then
+			find_root()
+		end
+	end,
+})
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
