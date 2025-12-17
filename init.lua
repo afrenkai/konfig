@@ -1,6 +1,7 @@
 vim.g.mapleader = ","
 vim.g.maplocalleader = ","
 vim.g.have_nerd_font = true
+
 vim.cmd([[filetype plugin indent on]])
 vim.cmd([[syntax enable]])
 -- See `:help vim.o`
@@ -100,37 +101,39 @@ vim.api.nvim_create_autocmd("BufNewFile", {
 	end,
 })
 
-local function find_root()
-	local patterns = { ".git", "package.json", "Cargo.toml", "pyproject.toml", "setup.py", "Makefile" }
-	local current_file = vim.fn.expand("%:p:h")
-	if current_file == "" then
-		return
-	end
-	for file, pattern in ipairs(patterns) do
-		local root = vim.fn.finddir(pattern, current_file .. ";")
-		if root ~= "" then
-			vim.cmd("cd " .. vim.fn.fnamemodify(root, ":h"))
-			return
-		end
-		root = vim.fn.findfile(pattern, current_file .. ";")
-		if root ~= "" then
-			vim.cmd("cd " .. vim.fn.fnamemodify(root, ":h"))
-			return
-		end
-	end
-end
+-- local function find_root()
+-- 	local patterns = { ".git", "package.json", "Cargo.toml", "pyproject.toml", "setup.py", "Makefile" }
+-- 	local current_file = vim.fn.expand("%:p:h")
+-- 	if current_file == "" then
+-- 		return
+-- 	end
+-- 	for file, pattern in ipairs(patterns) do
+-- 		local root = vim.fn.finddir(pattern, current_file .. ";")
+-- 		if root ~= "" then
+-- 			vim.cmd("cd " .. vim.fn.fnamemodify(root, ":h"))
+-- 			return
+-- 		end
+-- 		root = vim.fn.findfile(pattern, current_file .. ";")
+-- 		if root ~= "" then
+-- 			vim.cmd("cd " .. vim.fn.fnamemodify(root, ":h"))
+-- 			return
+-- 		end
+-- 	end
+-- end
+--
+-- vim.api.nvim_create_autocmd("BufEnter", {
+-- 	desc = "Auto-detect project root directory",
+-- 	group = vim.api.nvim_create_augroup("auto-root", { clear = true }),
+-- 	callback = function()
+-- 		if vim.bo.buftype == "" then
+-- 			find_root()
+-- 		end
+-- 	end,
+-- })
+--
+-- local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
-vim.api.nvim_create_autocmd("BufEnter", {
-	desc = "Auto-detect project root directory",
-	group = vim.api.nvim_create_augroup("auto-root", { clear = true }),
-	callback = function()
-		if vim.bo.buftype == "" then
-			find_root()
-		end
-	end,
-})
 
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
 	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
@@ -616,7 +619,7 @@ require("lazy").setup({
 				-- <c-k>: Toggle signature help
 				--
 				-- See :h blink-cmp-config-keymap for defining your own keymap
-				preset = "super-tab",
+				preset = "cmdline",
 
 				-- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
 				--    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -860,8 +863,10 @@ require("lazy").setup({
 				--  If you are experiencing weird indenting issues, add the language to
 				--  the list of additional_vim_regex_highlighting and disabled languages for indent.
 				additional_vim_regex_highlighting = { "ruby" },
+				-- Disable default syntax for LaTeX files to use Tree-sitter instead
 				disable = function(lang, buf)
 					if lang == "latex" then
+						-- Check if this is a LaTeX file and VimTeX is loaded
 						return vim.b[buf].vimtex_main ~= nil and vim.g.vimtex_syntax_enabled == 1
 					end
 					return false
@@ -877,30 +882,9 @@ require("lazy").setup({
 		-- Download gameplay video after install/update,
 	},
 	{ "nvim-tree/nvim-web-devicons", opts = {} },
-	{
-		"akinsho/bufferline.nvim",
-		version = "*",
-		dependencies = { "nvim-tree/nvim-web-devicons" },
-		config = function()
-			require("bufferline").setup({
-				options = {
-					mode = "buffers", -- or "tabs"
-					diagnostics = "nvim_lsp",
-					separator_style = "slant", -- or "thick" | "thin" | { 'left', 'right' }
-					show_close_icon = false,
-					show_buffer_close_icons = false,
-					offsets = {
-						{
-							filetype = "neo-tree",
-							text = "File Explorer",
-							text_align = "center",
-							separator = true,
-						},
-					},
-				},
-			})
-		end,
-	},
+	{'akinsho/bufferline.nvim', version = "*", dependencies = 'nvim-tree/nvim-web-devicons'},
+
+
 	require("kickstart.plugins.debug"),
 	require("kickstart.plugins.indent_line"),
 	require("kickstart.plugins.lint"),
