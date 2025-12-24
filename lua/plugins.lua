@@ -9,7 +9,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 
 
-
 ---@type vim.Option
 local rtp = vim.opt.rtp
 rtp:prepend(lazypath)
@@ -28,7 +27,3 @@ require("lazy").setup(
 	require("plugins.web_devicons"),
 	require("plugins.bufferline"),
 	}, {})
-
--- from bufferline repo readme :)
-vim.opt.termguicolors = true
-require("bufferline").setup{}
