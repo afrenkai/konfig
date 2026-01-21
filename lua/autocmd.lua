@@ -6,15 +6,15 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-	desc = "Configure LaTeX files for Tree-sitter highlighting",
-	pattern = { "tex", "latex" },
-	group = vim.api.nvim_create_augroup("latex-treesitter", { clear = true }),
-	callback = function()
-		vim.treesitter.start()
-		vim.cmd("syntax off")
-	end,
-})
+-- vim.api.nvim_create_autocmd("FileType", {
+-- 	desc = "Configure LaTeX files for Tree-sitter highlighting",
+-- 	pattern = { "tex", "latex" },
+-- 	group = vim.api.nvim_create_augroup("latex-treesitter", { clear = true }),
+-- 	callback = function()
+-- 		vim.treesitter.start()
+-- 		vim.cmd("syntax off")
+-- 	end,
+-- })
 
 vim.api.nvim_create_autocmd("BufNewFile", {
 	desc = "Insert LaTeX template for new .tex files",

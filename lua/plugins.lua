@@ -26,4 +26,6 @@ require("lazy").setup(
 	-- require("plugins.subwaysurfers"),
 	require("plugins.web_devicons"),
 	require("plugins.bufferline"),
+	require("plugins.lsp"),
+  require("plugins.telescope"),
 	}, {})

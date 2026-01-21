@@ -8,7 +8,7 @@ return	{
 				"c",
 				"diff",
 				"html",
-				"latex",
+				-- "latex",
 				"lua",
 				"luadoc",
 				"markdown",
@@ -22,9 +22,9 @@ return	{
 				enable = true,
 				additional_vim_regex_highlighting = { "ruby" },
 				disable = function(lang, buf)
-					if lang == "latex" then
-						return vim.b[buf].vimtex_main ~= nil and vim.g.vimtex_syntax_enabled == 1
-					end
+					-- if lang == "latex" then
+					-- 	return vim.b[buf].vimtex_main ~= nil and vim.g.vimtex_syntax_enabled == 1
+					-- end
 					return false
 				end,
 			},
