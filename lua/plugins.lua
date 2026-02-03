@@ -27,5 +27,6 @@ require("lazy").setup(
 	require("plugins.web_devicons"),
 	require("plugins.bufferline"),
 	require("plugins.lsp"),
-  require("plugins.telescope"),
+	require("plugins.telescope"),
+	require("plugins.nbviz")
 	}, {})
